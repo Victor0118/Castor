@@ -15,6 +15,9 @@ class QATrainer(Trainer):
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
+
+        average_loss, mean_average_precision, mean_reciprocal_rank = self.evaluate(self.train_evaluator, 'train')
+
         for batch_idx, batch in enumerate(self.train_loader):
             self.optimizer.zero_grad()
             output = self.model(batch.sentence_1, batch.sentence_2, batch.ext_feats)
@@ -29,7 +32,6 @@ class QATrainer(Trainer):
                     100. * batch_idx / (len(self.train_loader)), loss.data[0])
                 )
 
-        average_loss, mean_average_precision, mean_reciprocal_rank = self.evaluate(self.train_evaluator, 'train')
 
         if self.use_tensorboard:
             self.writer.add_scalar('{}/train/cross_entropy_loss'.format(self.train_loader.dataset.NAME), average_loss, epoch)

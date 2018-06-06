@@ -1,4 +1,5 @@
 import os
+import shlex
 import subprocess
 import time
 
@@ -25,12 +26,19 @@ def get_map_mrr(qids, predictions, labels, device=0):
             f2.write(results_template.format(qid=qid, docno=docno, sim=predicted))
 
     trec_eval_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'trec_eval-9.0.5/trec_eval')
-    trec_out = subprocess.check_output([trec_eval_path, '-m', 'map', '-m', 'recip_rank', qrel_fname, results_fname])
-    trec_out_lines = str(trec_out, 'utf-8').split('\n')
-    mean_average_precision = float(trec_out_lines[0].split('\t')[-1])
-    mean_reciprocal_rank = float(trec_out_lines[1].split('\t')[-1])
 
-    os.remove(qrel_fname)
-    os.remove(results_fname)
+    pargs = shlex.split("/bin/sh ../utils/run_eval.sh '{}' '{}'".format(results_fname, qrel_fname))
+    p = subprocess.Popen(pargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    pout, perr = p.communicate()
+    print(perr)
+    lines = pout.split(b'\n')
+    mean_average_precision = float(lines[0].strip().split()[-1])
+    mean_reciprocal_rank = float(lines[1].strip().split()[-1])
 
+    # trec_out = subprocess.check_output([trec_eval_path, '-m', 'map', '-m', 'recip_rank', qrel_fname, results_fname])
+    # trec_out_lines = str(trec_out, 'utf-8').split('\n')
+    # mean_average_precision = float(trec_out_lines[0].split('\t')[-1])
+    # mean_reciprocal_rank = float(trec_out_lines[1].split('\t')[-1])
+    # os.remove(qrel_fname)
+    # os.remove(results_fname)
     return mean_average_precision, mean_reciprocal_rank

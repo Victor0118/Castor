@@ -68,6 +68,13 @@ if __name__ == '__main__':
     model = MPCNN(embedding, args.holistic_filters, args.per_dim_filters, filter_widths,
                     args.hidden_units, dataset_cls.NUM_CLASSES, args.dropout, args.sparse_features)
 
+
+    def count_parameters(model):
+        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+    print("count_parameters: ", count_parameters(model))
+
     if args.device != -1:
         with torch.cuda.device(args.device):
             model.cuda()
