@@ -110,6 +110,9 @@ os.makedirs(os.path.join(args.save_path, args.dataset), exist_ok=True)
 print(header)
 
 
+train_acc_list = []
+dev_acc_list = []
+test_acc_list = []
 while True:
     if early_stop:
         print("Early Stopping. Epoch: {}, Best Dev Acc: {}".format(epoch, best_dev_acc))
@@ -127,7 +130,8 @@ while True:
         scores = model(batch)
         n_correct += (torch.max(scores, 1)[1].view(batch.label.size()).data == batch.label.data).sum()
         n_total += batch.batch_size
-        train_acc = 100. * n_correct / n_total
+       	train_acc = 100. * n_correct / n_total
+        train_acc_list.append(train_acc)
 
         loss = criterion(scores, batch.label)
         loss.backward()
@@ -147,6 +151,7 @@ while True:
                 dev_loss = criterion(scores, dev_batch.label)
                 dev_losses.append(dev_loss.data[0])
             dev_acc = 100. * n_dev_correct / len(dev)
+            dev_acc_list.append(dev_acc)
             print(dev_log_template.format(time.time() - start,
                                           epoch, iterations, 1 + batch_idx, len(train_iter),
                                           100. * (1 + batch_idx) / len(train_iter), loss.data[0],
@@ -160,9 +165,9 @@ while True:
                 torch.save(model, snapshot_path)
             else:
                 iters_not_improved += 1
-                if iters_not_improved >= args.patience:
-                    early_stop = True
-                    break
+                #if iters_not_improved >= args.patience:
+                #    early_stop = True
+                #    break
 
         if iterations % args.log_every == 1:
             # print progress message
@@ -172,6 +177,12 @@ while True:
                                       n_correct / n_total * 100, ' ' * 12))
 
 
+import pickle
+with open("train_acc_list.pkl", "wb") as tl:
+    pickle.dump(train_acc_list, tl)
+
+with open("def_acc_list.pkl", "wb") as tl:
+    pickle.dump(dev_acc_list, tl)
 
 
 

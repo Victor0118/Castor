@@ -8,7 +8,7 @@ def sst_tokenize(sentence):
     return sentence.split()
 
 class SSTEmbeddingLoader(object):
-    def __init__(self, dirname, fmt="stsa.fine.{}", word2vec_file="word2vec.sst-1"):
+    def __init__(self, dirname, fmt="new_stsa.fine.{}", word2vec_file="word2vec.sst-1"):
         self.dirname = dirname
         self.fmt = fmt
         self.word2vec_file = word2vec_file
@@ -42,7 +42,7 @@ class SSTDataset(data.Dataset):
         return self.sentences[index]
 
     @classmethod
-    def load_sst_sets(cls, dirname, fmt="stsa.fine.{}"):
+    def load_sst_sets(cls, dirname, fmt="new_stsa.fine.{}"):
         set_names = ["phrases.train", "dev", "test"]
         def read_set(name):
             data_set = []

@@ -75,7 +75,7 @@ def train(**kwargs):
         conv_rnn = model.ConvRNNModel(word_model, **kwargs)
         if not kwargs["no_cuda"]:
             conv_rnn.cuda()
-
+    
     conv_rnn.train()
     criterion = nn.CrossEntropyLoss()
     parameters = list(filter(lambda p: p.requires_grad, conv_rnn.parameters()))
@@ -105,7 +105,8 @@ def train(**kwargs):
                 print("{} set accuracy: {}, loss: {}".format("dev" if dev else "test", accuracy, loss))
         conv_rnn.train()
     evaluate.best_dev = 0
-
+    
+    train_acc_list = []
     for epoch in range(n_epochs):
         print("Epoch number: {}".format(epoch), end="\r")
         if verbose:
@@ -123,12 +124,16 @@ def train(**kwargs):
             loss.backward()
             optimizer.step()
             accuracy = (torch.max(scores, 1)[1].view(-1).data == train_out.data).sum() / mbatch_size
-            if verbose and i % (mbatch_size * 10) == 0:
+            train_acc_list.append(accuracy)
+            if verbose and i % (mbatch_size * 100) == 0:
                 print("accuracy: {}, {} / {}".format(accuracy, j * mbatch_size, len(train_set)))
             i += mbatch_size
             if i % (len(train_set) // kwargs["dev_per_epoch"]) < mbatch_size:
                 evaluate(dev_loader)
     evaluate(test_loader, dev=False)
+    import pickle 
+    with open("train_acc_list.pkl", "wb") as output:
+         pickle.dump(train_acc_list, output)
     return evaluate.best_dev
 
 def do_random_search(given_params):

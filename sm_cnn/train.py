@@ -116,6 +116,16 @@ else:
 
 parameter = filter(lambda p: p.requires_grad, model.parameters())
 
+def get_n_params(model):
+    pp=0
+    for p in list(model.parameters()):
+        nn=1
+        for s in list(p.size()):
+            nn = nn*s
+        pp += nn
+    return pp
+
+print("number of parameters: {}".format(get_n_params(model)))
 # the SM model originally follows SGD but Adadelta is used here
 optimizer = torch.optim.Adadelta(parameter, lr=args.lr, weight_decay=args.weight_decay)
 criterion = nn.CrossEntropyLoss()
