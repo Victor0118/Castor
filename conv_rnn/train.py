@@ -128,7 +128,7 @@ def train(**kwargs):
             loss.backward()
             optimizer.step()
             accuracy = (torch.max(scores, 1)[1].view(-1).data == train_out.data).float().sum() / mbatch_size
-            if verbose and i % (mbatch_size * 10) == 0:
+            if verbose and i % (mbatch_size * 1000) == 0:
                 print("accuracy: {}, {} / {}".format(accuracy, j * mbatch_size, len(train_set)))
             i += mbatch_size
             if i % (len(train_set) // kwargs["dev_per_epoch"]) < mbatch_size:
@@ -137,9 +137,9 @@ def train(**kwargs):
 
         if epoch % 100:
             train_acc_list.append(accuracy)
-            with open("train_acc_list.pkl", "wb") as output:
+            with open("train_acc_list_pytorch0.3.pkl", "wb") as output:
                 pickle.dump(train_acc_list, output)
-            with open("dev_acc_list.pkl", "wb") as output:
+            with open("dev_acc_list_pytorch0.3.pkl", "wb") as output:
                 pickle.dump(dev_acc_list, output)
     evaluate(test_loader, dev=False)
     return evaluate.best_dev
