@@ -1,6 +1,7 @@
 import argparse
 import os
 import random
+import pickle
 
 from torch import utils
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -104,9 +105,12 @@ def train(**kwargs):
             if verbose:
                 print("{} set accuracy: {}, loss: {}".format("dev" if dev else "test", accuracy, loss))
         conv_rnn.train()
+        return accuracy
+
     evaluate.best_dev = 0
     
     train_acc_list = []
+    dev_acc_list = []
     for epoch in range(n_epochs):
         print("Epoch number: {}".format(epoch), end="\r")
         if verbose:
@@ -128,12 +132,18 @@ def train(**kwargs):
                 print("accuracy: {}, {} / {}".format(accuracy, j * mbatch_size, len(train_set)))
             i += mbatch_size
             if i % (len(train_set) // kwargs["dev_per_epoch"]) < mbatch_size:
-                evaluate(dev_loader)
+                dev_acc = evaluate(dev_loader)
+                dev_acc_list.append(dev_acc)
+
+        if epoch % 100:
+            train_acc_list.append(accuracy)
+            with open("train_acc_list.pkl", "wb") as output:
+                pickle.dump(train_acc_list, output)
+            with open("dev_acc_list.pkl", "wb") as output:
+                pickle.dump(dev_acc_list, output)
     evaluate(test_loader, dev=False)
-    import pickle 
-    with open("train_acc_list.pkl", "wb") as output:
-         pickle.dump(train_acc_list, output)
     return evaluate.best_dev
+
 
 def do_random_search(given_params):
     test_grid = [[0.15, 0.2], [4, 5, 6], [150, 200], [3, 4, 5], [200, 300], [200, 250]]
@@ -154,7 +164,7 @@ def do_random_search(given_params):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dev_per_epoch", default=9, type=int)
+    parser.add_argument("--dev_per_epoch", default=1, type=int)
     parser.add_argument("--fc_size", default=200, type=int)
     parser.add_argument("--gpu_number", default=0, type=int)
     parser.add_argument("--hidden_size", default=200, type=int)

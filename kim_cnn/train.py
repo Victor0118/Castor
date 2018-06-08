@@ -9,6 +9,7 @@ from args import get_args
 from model import KimCNN
 from SST1 import SST1Dataset
 from utils import clean_str_sst
+import pickle
 
 # Set default configuration in : args.py
 args = get_args()
@@ -176,13 +177,12 @@ while True:
                                       100. * (1 + batch_idx) / len(train_iter), loss.data[0], ' ' * 8,
                                       n_correct / n_total * 100, ' ' * 12))
 
+    if epoch % 100 == 0:
+        with open("train_acc_list.pkl", "wb") as tl:
+            pickle.dump(train_acc_list, tl)
 
-import pickle
-with open("train_acc_list.pkl", "wb") as tl:
-    pickle.dump(train_acc_list, tl)
-
-with open("def_acc_list.pkl", "wb") as tl:
-    pickle.dump(dev_acc_list, tl)
+        with open("def_acc_list.pkl", "wb") as tl:
+            pickle.dump(dev_acc_list, tl)
 
 
 
