@@ -102,7 +102,6 @@ class MPCNN(nn.Module):
                     'mean': F.avg_pool1d(sent_flattened, sent_flattened_size).view(sent.size(0), -1)
                 }
                 continue
-
             holistic_conv_out_max = self.holistic_conv_layers_max[ws - 1](sent)
             holistic_conv_out_min = self.holistic_conv_layers_min[ws - 1](sent)
             holistic_conv_out_mean = self.holistic_conv_layers_mean[ws - 1](sent)
