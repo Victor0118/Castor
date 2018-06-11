@@ -137,9 +137,9 @@ def train(**kwargs):
 
         if epoch % 100:
             train_acc_list.append(accuracy)
-            with open("train_acc_list_pytorch0.3.pkl", "wb") as output:
+            with open("train_acc_list_pytorch0.3_nonstatic.pkl", "wb") as output:
                 pickle.dump(train_acc_list, output)
-            with open("dev_acc_list_pytorch0.3.pkl", "wb") as output:
+            with open("dev_acc_list_pytorch0.3_nonstatic.pkl", "wb") as output:
                 pickle.dump(dev_acc_list, output)
     evaluate(test_loader, dev=False)
     return evaluate.best_dev
