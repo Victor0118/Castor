@@ -178,12 +178,12 @@ while True:
                                       n_correct / n_total * 100, ' ' * 12))
 
     if epoch % 100 == 0:
-        train_file = "train_sample_acc_list.pkl"
+        train_file = "train_larger_acc_list.pkl"
         print("saving to {}".format(train_file))
         with open(train_file, "wb") as tl:
             pickle.dump(train_acc_list, tl)
 
-        with open("def2_acc_list.pkl", "wb") as tl:
+        with open("def_larger_acc_list.pkl", "wb") as tl:
             pickle.dump(dev_acc_list, tl)
 
 

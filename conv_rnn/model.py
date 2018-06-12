@@ -78,7 +78,7 @@ class ConvRNNModel(nn.Module):
         return self.fc2(x)
 
 class WordEmbeddingModel(nn.Module):
-    def __init__(self, id_dict, weights, unknown_vocab=[], static=False, padding_idx=0):
+    def __init__(self, id_dict, weights, unknown_vocab=[], static=True, padding_idx=0):
         super().__init__()
         vocab_size = len(id_dict) + len(unknown_vocab)
         self.lookup_table = id_dict

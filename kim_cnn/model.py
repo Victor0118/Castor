@@ -13,7 +13,7 @@ class KimCNN(nn.Module):
         embed_num = config.embed_num
         embed_dim = config.embed_dim
         self.mode = config.mode
-        Ks = 3 # There are three conv net here
+        Ks = 6 # There are three conv net here
         if config.mode == 'multichannel':
             input_channel = 2
         else:
@@ -26,6 +26,9 @@ class KimCNN(nn.Module):
         self.conv1 = nn.Conv2d(input_channel, output_channel, (3, words_dim), padding=(2,0))
         self.conv2 = nn.Conv2d(input_channel, output_channel, (4, words_dim), padding=(3,0))
         self.conv3 = nn.Conv2d(input_channel, output_channel, (5, words_dim), padding=(4,0))
+        self.conv4 = nn.Conv2d(input_channel, output_channel, (3, words_dim), padding=(2, 0))
+        self.conv5 = nn.Conv2d(input_channel, output_channel, (4, words_dim), padding=(3, 0))
+        self.conv6 = nn.Conv2d(input_channel, output_channel, (5, words_dim), padding=(4, 0))
 
         self.dropout = nn.Dropout(config.dropout)
         self.fc1 = nn.Linear(Ks * output_channel, target_class)
@@ -49,7 +52,8 @@ class KimCNN(nn.Module):
         else:
             print("Unsupported Mode")
             exit()
-        x = [F.relu(self.conv1(x)).squeeze(3), F.relu(self.conv2(x)).squeeze(3), F.relu(self.conv3(x)).squeeze(3)]
+        x = [F.relu(self.conv1(x)).squeeze(3), F.relu(self.conv2(x)).squeeze(3), F.relu(self.conv3(x)).squeeze(3),
+             F.relu(self.conv4(x)).squeeze(3), F.relu(self.conv5(x)).squeeze(3), F.relu(self.conv6(x)).squeeze(3)]
         # (batch, channel_output, ~=sent_len) * Ks
         x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x] # max-over-time pooling
         # (batch, channel_output) * Ks
