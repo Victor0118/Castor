@@ -137,9 +137,9 @@ def train(**kwargs):
 
         if epoch % 100:
             train_acc_list.append(accuracy)
-            with open("train_acc_list_pytorch0.3_nonstatic.pkl", "wb") as output:
+            with open("train_acc_list_pytorch0.3_small.pkl", "wb") as output:
                 pickle.dump(train_acc_list, output)
-            with open("dev_acc_list_pytorch0.3_nonstatic.pkl", "wb") as output:
+            with open("dev_acc_list_pytorch0.3_small.pkl", "wb") as output:
                 pickle.dump(dev_acc_list, output)
     evaluate(test_loader, dev=False)
     return evaluate.best_dev
@@ -171,7 +171,7 @@ def main():
     parser.add_argument("--input_file", default="saves/model.pt", type=str)
     parser.add_argument("--lr", default=1E-1, type=float)
     parser.add_argument("--mbatch_size", default=64, type=int)
-    parser.add_argument("--n_epochs", default=30, type=int)
+    parser.add_argument("--n_epochs", default=3000, type=int)
     parser.add_argument("--n_feature_maps", default=200, type=float)
     parser.add_argument("--n_labels", default=5, type=int)
     parser.add_argument("--no_cuda", action="store_true", default=False)

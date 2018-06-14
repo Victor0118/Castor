@@ -23,7 +23,7 @@ class SSTEmbeddingLoader(object):
                 vec = np.array([float(v) for v in vec.split(" ")])
                 weights.append(vec)
                 id_dict[word] = i
-        with open(os.path.join(self.dirname, self.fmt.format("phrases.train"))) as f:
+        with open(os.path.join(self.dirname, self.fmt.format("phrases.train.sample"))) as f:
             for line in f.readlines():
                 for word in sst_tokenize(line):
                     if word not in id_dict and word not in unk_vocab_set:
@@ -43,7 +43,7 @@ class SSTDataset(data.Dataset):
 
     @classmethod
     def load_sst_sets(cls, dirname, fmt="new_stsa.fine.{}"):
-        set_names = ["phrases.train", "dev", "test"]
+        set_names = ["phrases.train.sample", "dev", "test"]
         def read_set(name):
             data_set = []
             with open(os.path.join(dirname, fmt.format(name))) as f:
