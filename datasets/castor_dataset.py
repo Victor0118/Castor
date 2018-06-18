@@ -34,9 +34,22 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
 
         examples = []
         with open(os.path.join(path, 'a.toks'), 'r') as f1, open(os.path.join(path, 'b.toks'), 'r') as f2:
-            sent_list_1 = [l.rstrip('.\n').split(' ') for l in f1]
-            sent_list_2 = [l.rstrip('.\n').split(' ') for l in f2]
-
+            sent_st_1 = [l.rstrip('.\n').split(' ') for l in f1]
+            sent_list_2 = []
+            print("reading: {}".format(os.path.join(path, 'b.toks')))
+            ind = 0
+            while True:
+                try:
+                    l = ""
+                    l = f2.readline()
+                    sent_list_2.append(l.rstrip('.\n').split(' ') )
+                    if ("" == l):
+                        print("file finished")
+                        break
+                    ind += 1
+                except Exception as e:
+                    print(ind)
+                    print(e)
         word_to_doc_cnt = get_pairwise_word_to_doc_freq(sent_list_1, sent_list_2)
         self.word_to_doc_cnt = word_to_doc_cnt
 
