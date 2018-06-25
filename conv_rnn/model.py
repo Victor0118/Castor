@@ -52,7 +52,9 @@ class ConvRNNModel(nn.Module):
         return torch.from_numpy(np.array(self.word_model.lookup(sentences)))
 
     def forward(self, x):
+        nn.LSTM
         x = self.word_model(x) # shape: (batch, max sent, embed dim)
+
         if x.size(0) == self.batch_size:
             h_0 = self.h_0_cache
             c_0 = self.c_0_cache

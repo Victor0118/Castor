@@ -10,11 +10,13 @@ class QAEvaluator(Evaluator):
         self.model.eval()
         test_cross_entropy_loss = 0
         qids = []
+        docnos = []
         true_labels = []
         predictions = []
 
         for batch in self.data_loader:
             qids.extend(batch.id.detach().cpu().numpy())
+            docnos.extend(batch.aid.detach().cpu().numpy())
             # Select embedding
             sent1, sent2 = self.get_sentence_embeddings(batch)
 
@@ -29,7 +31,7 @@ class QAEvaluator(Evaluator):
         qids = list(map(lambda n: int(round(n * 10, 0)) / 10, qids))
 
         mean_average_precision, mean_reciprocal_rank = get_map_mrr(qids, predictions, true_labels,
-                                                                   self.data_loader.device,
+                                                                   self.data_loader.device, docnos,
                                                                    keep_results=self.keep_results)
         test_cross_entropy_loss /= len(batch.dataset.examples)
 

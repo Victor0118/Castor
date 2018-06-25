@@ -34,7 +34,7 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
 
         examples = []
         with open(os.path.join(path, 'a.toks'), 'r') as f1, open(os.path.join(path, 'b.toks'), 'r') as f2:
-            sent_st_1 = [l.rstrip('.\n').split(' ') for l in f1]
+            sent_list_1 = [l.rstrip('.\n').split(' ') for l in f1]
             sent_list_2 = []
             print("reading: {}".format(os.path.join(path, 'b.toks')))
             ind = 0
@@ -44,7 +44,7 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
                     l = f2.readline()
                     sent_list_2.append(l.rstrip('.\n').split(' ') )
                     if ("" == l):
-                        print("file finished")
+                        print("reading doc file finished")
                         break
                     ind += 1
                 except Exception as e:
@@ -59,10 +59,17 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
             overlap_feats = np.loadtxt(os.path.join(path, 'overlap_feats.txt'))
 
         with open(os.path.join(path, 'id.txt'), 'r') as id_file, open(os.path.join(path, 'sim.txt'), 'r') as label_file:
-            for i, (pair_id, l1, l2, ext_feats, label) in enumerate(zip(id_file, sent_list_1, sent_list_2, overlap_feats, label_file)):
+            try:
+                print("reading docid file: {}".format(os.path.join(path, 'docid.txt')))
+                aids = open(os.path.join(path, 'docid.txt'), 'r').readlines()
+                print("reading docid file finshed")
+            except Exception as e:
+                aids = list(range(len(sent_list_1)))
+                print(e)
+            for pair_id, l1, l2, ext_feats, label, aid in zip(id_file, sent_list_1, sent_list_2, overlap_feats, label_file, aids):
                 pair_id = pair_id.rstrip('.\n')
                 label = label.rstrip('.\n')
-                example_list = [pair_id, l1, l2, ext_feats, label, i + 1, ' '.join(l1), ' '.join(l2)]
+                example_list = [pair_id, l1, l2, ext_feats, label, aid, ' '.join(l1), ' '.join(l2)]
                 example = Example.fromlist(example_list, fields)
                 examples.append(example)
 

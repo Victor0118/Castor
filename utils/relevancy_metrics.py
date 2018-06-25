@@ -3,7 +3,7 @@ import subprocess
 import time
 
 
-def get_map_mrr(qids, predictions, labels, device=0, keep_results=False):
+def get_map_mrr(qids, predictions, labels, device=0, docnos=None, keep_results=False):
     """
     Get the map and mrr using the trec_eval utility.
     qids, predictions, labels should have the same length.
@@ -19,7 +19,7 @@ def get_map_mrr(qids, predictions, labels, device=0, keep_results=False):
     qrel_template = '{qid} 0 {docno} {rel}\n'
     results_template = '{qid} 0 {docno} 0 {sim} mpcnn\n'
     with open(qrel_fname, 'w') as f1, open(results_fname, 'w') as f2:
-        docnos = range(len(qids))
+        # docnos = range(len(qids))
         for qid, docno, predicted, actual in zip(qids, docnos, predictions, labels):
             f1.write(qrel_template.format(qid=qid, docno=docno, rel=actual))
             f2.write(results_template.format(qid=qid, docno=docno, sim=predicted))
