@@ -15,8 +15,10 @@ from utils.serialization import load_checkpoint
 from .model import VDPWIModel
 
 
-def evaluate_dataset(split_name, dataset_cls, model, embedding, loader, batch_size, device):
-    saved_model_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, loader, batch_size, device)
+def evaluate_dataset(split_name, dataset_cls, model, embedding, loader, batch_size, device, keep_results=False, index2qid=None, index2aid=None):
+    saved_model_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, loader, batch_size, device,
+                                                           keep_results=keep_results, index2qid=index2qid,
+                                                           index2aid=index2aid)
     scores, metric_names = saved_model_evaluator.get_scores()
     logger.info('Evaluation metrics for {}'.format(split_name))
     logger.info('\t'.join([' '] + metric_names))
@@ -26,7 +28,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch implementation of VDPWI')
     parser.add_argument('model_outfile', help='file to save final model')
     parser.add_argument('--dataset', help='dataset to use, one of [sick, msrvid, trecqa, wikiqa]', default='sick')
-    parser.add_argument('--word-vectors-dir', help='word vectors directory', default=os.path.join(os.pardir, os.pardir, 'Castor-data', 'embeddings', 'GloVe'))
+    parser.add_argument('--word-vectors-dir', help='word vectors directory', default=os.path.join(os.pardir, 'Castor-data', 'embeddings', 'GloVe'))
     parser.add_argument('--word-vectors-file', help='word vectors filename', default='glove.840B.300d.txt')
     parser.add_argument('--word-vectors-dim', type=int, default=300,
                         help='number of dimensions of word vectors (default: 300)')
@@ -54,6 +56,9 @@ if __name__ == '__main__':
     parser.add_argument('--res-fmaps', type=int, default=32)
     parser.add_argument('--res-layers', type=int, default=16)
     parser.add_argument('--rnn-hidden-dim', type=int, default=250)
+    parser.add_argument('--keep-results', action='store_true',
+                        help='store the output score and qrel files into disk for the test set')
+
     args = parser.parse_args()
 
     device = torch.device(f'cuda:{args.device}' if torch.cuda.is_available() and args.device >= 0 else 'cpu')
@@ -76,7 +81,7 @@ if __name__ == '__main__':
 
     logger.info(pprint.pformat(vars(args)))
 
-    dataset_cls, embedding, train_loader, test_loader, dev_loader \
+    dataset_cls, embedding, train_loader, test_loader, dev_loader, index2qid, index2aid \
         = DatasetFactory.get_dataset(args.dataset, args.word_vectors_dir, args.word_vectors_file, args.batch_size, args.device)
 
     model_config = {
@@ -137,5 +142,9 @@ if __name__ == '__main__':
 
     model.load_state_dict(state_dict)
     if dev_loader:
-        evaluate_dataset('dev', dataset_cls, model, embedding, dev_loader, args.batch_size, args.device)
-    evaluate_dataset('test', dataset_cls, model, embedding, test_loader, args.batch_size, args.device)
+        evaluate_dataset('train', dataset_cls, model, embedding, train_loader, args.batch_size, args.device,
+                         keep_results=args.keep_results, index2qid=index2qid, index2aid=index2aid)
+        evaluate_dataset('dev', dataset_cls, model, embedding, dev_loader, args.batch_size, args.device,
+                         keep_results=args.keep_results, index2qid=index2qid, index2aid=index2aid)
+    evaluate_dataset('test', dataset_cls, model, embedding, test_loader, args.batch_size, args.device,
+                         keep_results=args.keep_results, index2qid=index2qid, index2aid=index2aid)

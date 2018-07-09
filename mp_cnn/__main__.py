@@ -153,5 +153,8 @@ if __name__ == '__main__':
 
     model.load_state_dict(state_dict)
     if dev_loader:
-        evaluate_dataset('dev', dataset_cls, model, embedding, dev_loader, args.batch_size, args.device, args.keep_results)
+        evaluate_dataset('train', dataset_cls, model, embedding, train_loader, args.batch_size, args.device,
+                         args.keep_results)
+        evaluate_dataset('dev', dataset_cls, model, embedding, dev_loader, args.batch_size, args.device,
+                         args.keep_results)
     evaluate_dataset('test', dataset_cls, model, embedding, test_loader, args.batch_size, args.device, args.keep_results)

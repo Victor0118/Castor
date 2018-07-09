@@ -13,10 +13,12 @@ class QAEvaluator(Evaluator):
         docnos = []
         true_labels = []
         predictions = []
+        # index2qid = np.array(self.data_loader.ID_FIELD.vocab.itos)
+        # index2aid = np.array(self.data_loader.AID_FIELD.vocab.itos)
 
         for batch in self.data_loader:
-            qids.extend(batch.id.detach().cpu().numpy())
-            docnos.extend(batch.aid.detach().cpu().numpy())
+            qids.extend(self.index2qid[batch.id.detach().cpu().numpy()])
+            docnos.extend(self.index2aid[batch.aid.detach().cpu().numpy()])
             # Select embedding
             sent1, sent2 = self.get_sentence_embeddings(batch)
 
