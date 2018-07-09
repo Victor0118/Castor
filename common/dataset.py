@@ -54,8 +54,6 @@ class DatasetFactory(object):
                 raise FileNotFoundError('TrecQA requires the trec_eval tool to run. Please run get_trec_eval.sh inside Castor/utils (as working directory) before continuing.')
             dataset_root = os.path.join(castor_dir, os.pardir, 'Castor-data', 'datasets', 'WikiQA/')
             train_loader, dev_loader, test_loader = WikiQA.iters(dataset_root, word_vectors_file, word_vectors_dir, batch_size, device=device, unk_init=UnknownWordVecCache.unk)
-            WikiQA.ID_FIELD.build_vocab(train_loader, dev_loader, test_loader)
-            WikiQA.AID_FIELD.build_vocab(train_loader, dev_loader, test_loader)
             embedding = nn.Embedding.from_pretrained(WikiQA.TEXT_FIELD.vocab.vectors) # , freeze=False
             index2qid = np.array(WikiQA.ID_FIELD.vocab.itos)
             index2aid = np.array(WikiQA.AID_FIELD.vocab.itos)

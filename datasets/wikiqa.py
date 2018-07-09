@@ -51,6 +51,8 @@ class WikiQA(CastorPairDataset):
         """
 
         train, validation, test = cls.splits(path)
+        cls.ID_FIELD.build_vocab(train, validation, test)
+        cls.AID_FIELD.build_vocab(train, validation, test)
         if not pt_file:
             if vectors is None:
                 vectors = Vectors(name=vectors_name, cache=vectors_dir, unk_init=unk_init)
