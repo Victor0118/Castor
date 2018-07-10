@@ -31,7 +31,8 @@ def get_logger():
 
 def evaluate_dataset(split_name, dataset_cls, model, embedding, loader, batch_size, device, keep_results=False):
     saved_model_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, loader, batch_size, device,
-                                                           keep_results=keep_results)
+                                                           keep_results=keep_results, index2qid=index2qid,
+                                                           index2aid=index2aid)
     scores, metric_names = saved_model_evaluator.get_scores()
     logger.info('Evaluation metrics for {}'.format(split_name))
     logger.info('\t'.join([' '] + metric_names))
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     logger = get_logger()
     logger.info(pprint.pformat(vars(args)))
 
-    dataset_cls, embedding, train_loader, test_loader, dev_loader \
+    dataset_cls, embedding, train_loader, test_loader, dev_loader, index2qid, index2aid \
         = DatasetFactory.get_dataset(args.dataset, args.word_vectors_dir, args.word_vectors_file, args.batch_size, args.device)
 
     filter_widths = list(range(1, args.max_window_size + 1)) + [np.inf]
@@ -154,7 +155,8 @@ if __name__ == '__main__':
     model.load_state_dict(state_dict)
     if dev_loader:
         evaluate_dataset('train', dataset_cls, model, embedding, train_loader, args.batch_size, args.device,
-                         args.keep_results)
+                         args.keep_results, index2qid=index2qid, index2aid=index2aid)
         evaluate_dataset('dev', dataset_cls, model, embedding, dev_loader, args.batch_size, args.device,
-                         args.keep_results)
-    evaluate_dataset('test', dataset_cls, model, embedding, test_loader, args.batch_size, args.device, args.keep_results)
+                         args.keep_results, index2qid=index2qid, index2aid=index2aid)
+    evaluate_dataset('test', dataset_cls, model, embedding, test_loader, args.batch_size, args.device,
+                     args.keep_results, index2qid=index2qid, index2aid=index2aid)
