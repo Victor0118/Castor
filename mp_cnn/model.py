@@ -87,7 +87,8 @@ class MPCNN(nn.Module):
             # comparison units from per-dim conv
             2 * (len(self.filter_widths) - 1) * self.n_per_dim_filters * COMP_1_COMPONENTS_PER_DIM
         )
-        n_feats = n_feats_h + n_feats_v + self.ext_feats
+        # n_feats = n_feats_h + n_feats_v + self.ext_feats
+        n_feats = (n_feats_h + n_feats_v) * 3 + self.ext_feats
         return n_feats
 
     def _get_blocks_for_sentence(self, sent):

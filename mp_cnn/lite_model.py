@@ -97,19 +97,31 @@ class MPCNNLite(MPCNN):
 
         return torch.cat(comparison_feats, dim=1)
 
-    def forward(self, sent1, sent2, ext_feats=None, word_to_doc_count=None, raw_sent1=None, raw_sent2=None):
+    def forward(self, sent1, query1, query2, query3, sent2, ext_feats=None, word_to_doc_count=None, raw_sent1=None, raw_sent2=None):
         # Attention
         if self.attention != 'none':
             sent1, sent2 = self.concat_attention(sent1, sent2, word_to_doc_count, raw_sent1, raw_sent2)
+            query1, _ = self.concat_attention(query1, sent2, word_to_doc_count, raw_sent1, raw_sent2)
+            query2, _ = self.concat_attention(query2, sent2, word_to_doc_count, raw_sent1, raw_sent2)
+            query3, _ = self.concat_attention(query3, sent2, word_to_doc_count, raw_sent1, raw_sent2)
 
         # Sentence modeling module
         sent1_block_a = self._get_blocks_for_sentence(sent1)
+        query1 = self._get_blocks_for_sentence(query1)
+        query2 = self._get_blocks_for_sentence(query2)
+        query3 = self._get_blocks_for_sentence(query3)
         sent2_block_a = self._get_blocks_for_sentence(sent2)
 
         # Similarity measurement layer
-        feat_h = self._algo_1_horiz_comp(sent1_block_a, sent2_block_a)
-        feat_v = self._algo_2_vert_comp(sent1_block_a, sent2_block_a)
-        combined_feats = [feat_h, feat_v, ext_feats] if self.ext_feats else [feat_h, feat_v]
+        feat_h1 = self._algo_1_horiz_comp(query1, sent2_block_a)
+        feat_h2 = self._algo_1_horiz_comp(query2, sent2_block_a)
+        feat_h3 = self._algo_1_horiz_comp(query3, sent2_block_a)
+        feat_v1 = self._algo_2_vert_comp(query1, sent2_block_a)
+        feat_v2 = self._algo_2_vert_comp(query2, sent2_block_a)
+        feat_v3 = self._algo_2_vert_comp(query1, sent2_block_a)
+
+        combined_feats = [feat_h1, feat_h2, feat_h3, feat_v1, feat_v1, feat_v2, feat_v3,
+                          ext_feats] if self.ext_feats else [feat_h1, feat_h2, feat_h3, feat_v1, feat_v1, feat_v2, feat_v3]
         feat_all = torch.cat(combined_feats, dim=1)
 
         preds = self.final_layers(feat_all)

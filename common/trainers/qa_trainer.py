@@ -16,9 +16,9 @@ class QATrainer(Trainer):
             self.optimizer.zero_grad()
 
             # Select embedding
-            sent1, sent2 = self.get_sentence_embeddings(batch)
+            sent1, query1, query2, query3, sent2 = self.get_sentence_embeddings(batch)
 
-            output = self.model(sent1, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw)
+            output = self.model(sent1, query1, query2, query3, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw)
             loss = F.nll_loss(output, batch.label, size_average=False)
             total_loss += loss.item()
             loss.backward()

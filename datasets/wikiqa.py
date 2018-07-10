@@ -13,6 +13,9 @@ class WikiQA(CastorPairDataset):
     NUM_CLASSES = 2
     # ID_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True)
     ID_FIELD = Field(sequential=False, use_vocab=True, batch_first=True)
+    ID1_FIELD = Field(sequential=False, use_vocab=True, batch_first=True)
+    ID2_FIELD = Field(sequential=False, use_vocab=True, batch_first=True)
+    ID3_FIELD = Field(sequential=False, use_vocab=True, batch_first=True)
     # AID_FIELD = Field(sequential=False, use_vocab=False, batch_first=True)
     AID_FIELD = Field(sequential=False, use_vocab=True, batch_first=True)
     TEXT_FIELD = Field(batch_first=True, tokenize=lambda x: x)  # tokenizer is identity since we already tokenized it to compute external features

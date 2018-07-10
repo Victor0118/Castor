@@ -28,22 +28,27 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
         """
         Create a Castor dataset involving pairs of texts
         """
-        fields = [('id', self.ID_FIELD), ('sentence_1', self.TEXT_FIELD), ('sentence_2', self.TEXT_FIELD),
+        fields = [('id', self.ID_FIELD), ('sentence_1', self.TEXT_FIELD), ('query1', self.TEXT_FIELD),
+                  ('query2', self.TEXT_FIELD), ('query3', self.TEXT_FIELD), ('sentence_2', self.TEXT_FIELD),
                   ('ext_feats', self.EXT_FEATS_FIELD), ('label', self.LABEL_FIELD),
                   ('aid', self.AID_FIELD), ('sentence_1_raw', self.RAW_TEXT_FIELD), ('sentence_2_raw', self.RAW_TEXT_FIELD)]
 
         examples = []
-        with open(os.path.join(path, 'a.toks'), 'r') as f1, open(os.path.join(path, 'b.toks'), 'r') as f2:
+        with open(os.path.join(path, 'a.toks'), 'r') as f1, open(os.path.join(path, 'b.toks'), 'r') as f2, \
+            open(os.path.join(path, 'a1.toks'), 'r') as query1, open(os.path.join(path, 'a2.toks'), 'r') as query2, \
+            open(os.path.join(path, 'a3.toks'), 'r') as query3:
             sent_list_1 = [l.rstrip('.\n').split(' ') for l in f1]
+            query1 = [l.rstrip('.\n').split(' ') for l in query1]
+            query2 = [l.rstrip('.\n').split(' ') for l in query2]
+            query3 = [l.rstrip('.\n').split(' ') for l in query3]
             sent_list_2 = []
             print("reading: {}".format(os.path.join(path, 'b.toks')))
             ind = 0
             while True:
                 try:
-                    l = ""
                     l = f2.readline()
                     sent_list_2.append(l.rstrip('.\n').split(' ') )
-                    if ("" == l):
+                    if "" == l:
                         print("reading doc file finished")
                         break
                     ind += 1
@@ -66,10 +71,10 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
             except Exception as e:
                 aids = list(range(len(sent_list_1)))
                 print(e)
-            for pair_id, l1, l2, ext_feats, label, aid in zip(id_file, sent_list_1, sent_list_2, overlap_feats, label_file, aids):
+            for pair_id, l1, q1, q2, q3, l2, ext_feats, label, aid in zip(id_file, sent_list_1, query1, query2, query3, sent_list_2, overlap_feats, label_file, aids):
                 pair_id = pair_id.rstrip('.\n')
                 label = label.rstrip('.\n')
-                example_list = [pair_id, l1, l2, ext_feats, label, aid, ' '.join(l1), ' '.join(l2)]
+                example_list = [pair_id, l1, q1, q2, q3, l2, ext_feats, label, aid, ' '.join(l1), ' '.join(l2)]
                 example = Example.fromlist(example_list, fields)
                 examples.append(example)
 
