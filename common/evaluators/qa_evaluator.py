@@ -30,7 +30,7 @@ class QAEvaluator(Evaluator):
 
             del output
 
-        qids = list(map(lambda n: int(round(n * 10, 0)) / 10, qids))
+        # qids = list(map(lambda n: int(round(n * 10, 0)) / 10, qids))
 
         mean_average_precision, mean_reciprocal_rank = get_map_mrr(qids, predictions, true_labels,
                                                                    self.data_loader.device, docnos,

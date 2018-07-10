@@ -11,6 +11,8 @@ class Evaluator(object):
         self.batch_size = batch_size
         self.device = device
         self.keep_results = keep_results
+        assert index2qid is not None
+        assert index2aid is not None
         self.index2qid = index2qid
         self.index2aid = index2aid
 

@@ -108,9 +108,9 @@ if __name__ == '__main__':
     else:
         raise ValueError('optimizer not recognized: it should be one of adam, sgd, or rmsprop')
 
-    train_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, train_loader, args.batch_size, args.device)
-    test_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, test_loader, args.batch_size, args.device)
-    dev_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, dev_loader, args.batch_size, args.device)
+    train_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, train_loader, args.batch_size, args.device, index2qid=index2qid, index2aid=index2aid)
+    test_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, test_loader, args.batch_size, args.device, index2qid=index2qid, index2aid=index2aid)
+    dev_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, dev_loader, args.batch_size, args.device, index2qid=index2qid, index2aid=index2aid)
 
     trainer_config = {
         'optimizer': optimizer,
