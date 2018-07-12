@@ -19,7 +19,10 @@ class Evaluator(object):
     def get_sentence_embeddings(self, batch):
         sent1 = self.embedding(batch.sentence_1).transpose(1, 2)
         sent2 = self.embedding(batch.sentence_2).transpose(1, 2)
-        return sent1, sent2
+        query1 = self.embedding(batch.query1).transpose(1, 2)
+        query2 = self.embedding(batch.query2).transpose(1, 2)
+        query3 = self.embedding(batch.query3).transpose(1, 2)
+        return sent1, query1, query2, query3, sent2
 
     def get_scores(self):
         """

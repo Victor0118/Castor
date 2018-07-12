@@ -29,7 +29,8 @@ def get_logger():
     return logger
 
 
-def evaluate_dataset(split_name, dataset_cls, model, embedding, loader, batch_size, device, keep_results=False):
+def evaluate_dataset(split_name, dataset_cls, model, embedding, loader, batch_size, device, keep_results=False,
+                     index2qid=None, index2aid=None):
     saved_model_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, loader, batch_size, device,
                                                            keep_results=keep_results, index2qid=index2qid,
                                                            index2aid=index2aid)

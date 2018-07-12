@@ -24,6 +24,9 @@ class MPCNN(nn.Module):
         # compute number of inputs to first hidden layer
         n_feats = self._get_n_feats()
 
+        print("n_feats: {}".format(n_feats))
+        print("hidden_layer_units: {}".format(hidden_layer_units))
+
         self.final_layers = nn.Sequential(
             nn.Linear(n_feats, hidden_layer_units),
             nn.Tanh(),
@@ -88,7 +91,7 @@ class MPCNN(nn.Module):
             2 * (len(self.filter_widths) - 1) * self.n_per_dim_filters * COMP_1_COMPONENTS_PER_DIM
         )
         # n_feats = n_feats_h + n_feats_v + self.ext_feats
-        n_feats = (n_feats_h + n_feats_v) * 3 + self.ext_feats
+        n_feats = n_feats_h + n_feats_v + self.ext_feats
         return n_feats
 
     def _get_blocks_for_sentence(self, sent):
@@ -219,6 +222,7 @@ class MPCNN(nn.Module):
 
     def forward(self, sent1, sent2, ext_feats=None, word_to_doc_count=None, raw_sent1=None, raw_sent2=None):
         # Attention
+
         if self.attention != 'none':
             sent1, sent2 = self.concat_attention(sent1, sent2, word_to_doc_count, raw_sent1, raw_sent2)
 

@@ -20,9 +20,9 @@ class QAEvaluator(Evaluator):
             qids.extend(self.index2qid[batch.id.detach().cpu().numpy()])
             docnos.extend(self.index2aid[batch.aid.detach().cpu().numpy()])
             # Select embedding
-            sent1, sent2 = self.get_sentence_embeddings(batch)
+            sent1, query1, query2, query3, sent2 = self.get_sentence_embeddings(batch)
 
-            output = self.model(sent1, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw)
+            output = self.model(sent1, query1, query2, query3, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw)
             test_cross_entropy_loss += F.cross_entropy(output, batch.label, size_average=False).item()
 
             true_labels.extend(batch.label.detach().cpu().numpy())

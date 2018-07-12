@@ -37,7 +37,7 @@ class MPCNNLite(MPCNN):
             # comparison units from holistic conv for max pooling for infinite widths
             3
         )
-        n_feats = n_feats_h + n_feats_v + self.ext_feats
+        n_feats = (n_feats_h + n_feats_v) * 3 + self.ext_feats
         return n_feats
 
     def _get_blocks_for_sentence(self, sent):
@@ -118,11 +118,19 @@ class MPCNNLite(MPCNN):
         feat_h3 = self._algo_1_horiz_comp(query3, sent2_block_a)
         feat_v1 = self._algo_2_vert_comp(query1, sent2_block_a)
         feat_v2 = self._algo_2_vert_comp(query2, sent2_block_a)
-        feat_v3 = self._algo_2_vert_comp(query1, sent2_block_a)
+        feat_v3 = self._algo_2_vert_comp(query3, sent2_block_a)
+        # print("feat_h1.size(): {}".format(feat_h1.size()))
+        # print("feat_v1.size(): {}".format(feat_v1.size()))
+        # print("feat_h2.size(): {}".format(feat_h2.size()))
+        # print("feat_v2.size(): {}".format(feat_v2.size()))
+        # print("feat_h3.size(): {}".format(feat_h3.size()))
+        # print("feat_v3.size(): {}".format(feat_v3.size()))
 
         combined_feats = [feat_h1, feat_h2, feat_h3, feat_v1, feat_v1, feat_v2, feat_v3,
-                          ext_feats] if self.ext_feats else [feat_h1, feat_h2, feat_h3, feat_v1, feat_v1, feat_v2, feat_v3]
+                          ext_feats] if self.ext_feats else [feat_h1, feat_h2, feat_h3, feat_v1, feat_v2, feat_v3]
+
         feat_all = torch.cat(combined_feats, dim=1)
+        # print("feat_all.size(): {}".format(feat_all.size()))
 
         preds = self.final_layers(feat_all)
         return preds
