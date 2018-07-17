@@ -29,7 +29,7 @@ def get_logger():
     return logger
 
 
-def evaluate_dataset(split_name, dataset_cls, model, embedding, loader, batch_size, device, keep_results=False):
+def evaluate_dataset(split_name, dataset_cls, model, embedding, loader, batch_size, device, keep_results=False, index2qid=None, index2aid=None):
     saved_model_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, loader, batch_size, device,
                                                            keep_results=keep_results, index2qid=index2qid,
                                                            index2aid=index2aid)
@@ -120,11 +120,11 @@ if __name__ == '__main__':
         raise ValueError('optimizer not recognized: it should be either adam or sgd')
 
     train_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, train_loader, args.batch_size,
-                                                     args.device)
+                                                     args.device, index2qid=index2qid, index2aid=index2aid)
     test_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, test_loader, args.batch_size,
-                                                    args.device)
+                                                    args.device, index2qid=index2qid, index2aid=index2aid)
     dev_evaluator = EvaluatorFactory.get_evaluator(dataset_cls, model, embedding, dev_loader, args.batch_size,
-                                                   args.device)
+                                                   args.device, index2qid=index2qid, index2aid=index2aid)
 
     trainer_config = {
         'optimizer': optimizer,
