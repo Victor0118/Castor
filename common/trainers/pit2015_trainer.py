@@ -10,11 +10,11 @@ from utils.serialization import save_checkpoint
 class PIT2015Trainer(Trainer):
 
     def train_epoch(self, epoch):
-        self.model.train()
         total_loss = 0
+        self.model.train()
         for batch_idx, batch in enumerate(self.train_loader):
-            self.optimizer.zero_grad()
 
+            self.optimizer.zero_grad()
             # Select embedding
             sent1, sent2 = self.get_sentence_embeddings(batch)
 
@@ -29,6 +29,21 @@ class PIT2015Trainer(Trainer):
                     len(batch.dataset.examples),
                     100. * batch_idx / (len(self.train_loader)), loss.item() / len(batch))
                 )
+
+            if batch_idx % 80 == 79:
+                dev_scores = self.evaluate(self.dev_evaluator, 'dev')
+                accuracy, avg_loss, precision, recall, f1 = dev_scores
+                test_scores = self.evaluate(self.test_evaluator, 'test')
+                if self.use_tensorboard:
+                    self.writer.add_scalar('{}/lr'.format(self.train_loader.dataset.NAME),
+                                           self.optimizer.param_groups[0]['lr'], epoch)
+                    self.writer.add_scalar('{}/dev/cross_entropy_loss'.format(self.train_loader.dataset.NAME), avg_loss,
+                                           epoch)
+                    self.writer.add_scalar('{}/dev/accuracy'.format(self.train_loader.dataset.NAME), accuracy, epoch)
+                    self.writer.add_scalar('{}/dev/precision'.format(self.train_loader.dataset.NAME), precision, epoch)
+                    self.writer.add_scalar('{}/dev/recall'.format(self.train_loader.dataset.NAME), recall, epoch)
+                    self.writer.add_scalar('{}/dev/f1'.format(self.train_loader.dataset.NAME), f1, epoch)
+                self.model.train()
 
         accuracy, avg_loss, precision, recall, f1 = self.evaluate(self.train_evaluator, 'train')
 

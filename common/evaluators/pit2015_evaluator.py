@@ -13,6 +13,7 @@ class PIT2015Evaluator(Evaluator):
         acc_total = 0
         rel_total = 0
         pre_total = 0
+        off = 1e-8
         for batch_idx, batch in enumerate(self.data_loader):
             sent1, sent2 = self.get_sentence_embeddings(batch)
             scores = self.model(sent1, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw)
@@ -21,12 +22,12 @@ class PIT2015Evaluator(Evaluator):
             n_dev_correct += (prediction == gold_label).sum().item()
             acc_total += ((prediction == batch.label.data) * (prediction == 1)).sum().item()
             total_loss += F.nll_loss(scores, batch.label, size_average=False).item()
-            rel_total += batch.label.data.sum().item()
-            pre_total += torch.max(scores, 1)[1].view(batch.label.size()).data.sum().item()
+            rel_total += gold_label.sum().item()
+            pre_total += prediction.sum().item()
 
-        precision = acc_total / pre_total
-        recall = acc_total / rel_total
-        f1 = 2 * precision * recall / (precision + recall)
+        precision = acc_total / (pre_total + off)
+        recall = acc_total / (rel_total + off)
+        f1 = 2 * precision * recall / (precision + recall + off)
         accuracy = 100. * n_dev_correct / len(self.data_loader.dataset.examples)
         avg_loss = total_loss / len(self.data_loader.dataset.examples)
         return [accuracy, avg_loss, precision, recall, f1], ['accuracy', 'cross_entropy_loss', 'precision', 'recall', 'f1']

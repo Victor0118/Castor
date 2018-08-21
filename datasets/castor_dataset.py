@@ -23,21 +23,21 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
     EXT_FEATS = 4
     AID_FIELD = None
 
-    def get_char_ngram(self, sent, n): # , max_len=120
+    def get_char_ngram(self, sent, ngram_char): # , max_len=120
         res = []
         for w in sent:
-            if len(w) <= n:
+            if len(w) <= ngram_char:
                 res.append(w)
             else:
-                for i in range(len(w) - n + 1):
-                    res.append(w[i:i + n])
+                for i in range(len(w) - ngram_char + 1):
+                    res.append(w[i:i + ngram_char])
         if self.max_len < len(res):
             self.max_len = len(res)
         # res = res[:max_len]
         return res
 
     @abstractmethod
-    def __init__(self, path, load_ext_feats=False, ngram_num=4):
+    def __init__(self, path, load_ext_feats=False, ngram_char=-1):
         """
         Create a Castor dataset involving pairs of texts
         """
@@ -63,8 +63,9 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
             for i, (pair_id, l1, l2, ext_feats, label) in enumerate(zip(id_file, sent_list_1, sent_list_2, overlap_feats, label_file)):
                 pair_id = pair_id.rstrip('.\n')
                 label = label.rstrip('.\n')
-                # l1 = self.get_char_ngram(l1, n=ngram_num)
-                # l2 = self.get_char_ngram(l2, n=ngram_num)
+                if ngram_char > 0:
+                    l1 = self.get_char_ngram(l1, ngram_char=ngram_char)
+                    l2 = self.get_char_ngram(l2, ngram_char=ngram_char)
                 example_list = [pair_id, l1, l2, ext_feats, label, i + 1, ' '.join(l1), ' '.join(l2)]
                 example = Example.fromlist(example_list, fields)
                 examples.append(example)

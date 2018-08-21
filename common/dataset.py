@@ -29,40 +29,54 @@ class DatasetFactory(object):
     """
     Get the corresponding Dataset class for a particular dataset.
     """
+
     @staticmethod
-    def get_dataset(dataset_name, word_vectors_dir, word_vectors_file, batch_size, device, castor_dir="./", utils_trecqa="utils/trec_eval-9.0.5/trec_eval"):
+    def get_dataset(dataset_name, word_vectors_dir, word_vectors_file, batch_size, device, castor_dir="./",
+                    utils_trecqa="utils/trec_eval-9.0.5/trec_eval", ngram_char=-1):
         if dataset_name == 'sick':
             dataset_root = os.path.join(castor_dir, os.pardir, 'Castor-data', 'datasets', 'sick/')
-            train_loader, dev_loader, test_loader = SICK.iters(dataset_root, word_vectors_file, word_vectors_dir, batch_size, device=device, unk_init=UnknownWordVecCache.unk)
+            train_loader, dev_loader, test_loader = SICK.iters(dataset_root, word_vectors_file, word_vectors_dir,
+                                                               batch_size, device=device,
+                                                               unk_init=UnknownWordVecCache.unk)
             embedding = nn.Embedding.from_pretrained(SICK.TEXT_FIELD.vocab.vectors)
             return SICK, embedding, train_loader, test_loader, dev_loader
         elif dataset_name == 'msrvid':
             dataset_root = os.path.join(castor_dir, os.pardir, 'Castor-data', 'datasets', 'msrvid/')
             dev_loader = None
-            train_loader, test_loader = MSRVID.iters(dataset_root, word_vectors_file, word_vectors_dir, batch_size, device=device, unk_init=UnknownWordVecCache.unk)
+            train_loader, test_loader = MSRVID.iters(dataset_root, word_vectors_file, word_vectors_dir, batch_size,
+                                                     device=device, unk_init=UnknownWordVecCache.unk)
             embedding = nn.Embedding.from_pretrained(MSRVID.TEXT_FIELD.vocab.vectors)
             return MSRVID, embedding, train_loader, test_loader, dev_loader
         elif dataset_name == 'trecqa':
             if not os.path.exists(os.path.join(castor_dir, utils_trecqa)):
-                raise FileNotFoundError('TrecQA requires the trec_eval tool to run. Please run get_trec_eval.sh inside Castor/utils (as working directory) before continuing.')
+                raise FileNotFoundError(
+                    'TrecQA requires the trec_eval tool to run. Please run get_trec_eval.sh inside Castor/utils (as working directory) before continuing.')
             dataset_root = os.path.join(castor_dir, os.pardir, 'Castor-data', 'datasets', 'TrecQA/')
-            train_loader, dev_loader, test_loader = TRECQA.iters(dataset_root, word_vectors_file, word_vectors_dir, batch_size, device=device, unk_init=UnknownWordVecCache.unk)
+            train_loader, dev_loader, test_loader = TRECQA.iters(dataset_root, word_vectors_file, word_vectors_dir,
+                                                                 batch_size, device=device,
+                                                                 unk_init=UnknownWordVecCache.unk)
             embedding = nn.Embedding.from_pretrained(TRECQA.TEXT_FIELD.vocab.vectors)
             return TRECQA, embedding, train_loader, test_loader, dev_loader
         elif dataset_name == 'wikiqa':
             if not os.path.exists(os.path.join(castor_dir, utils_trecqa)):
-                raise FileNotFoundError('TrecQA requires the trec_eval tool to run. Please run get_trec_eval.sh inside Castor/utils (as working directory) before continuing.')
+                raise FileNotFoundError(
+                    'TrecQA requires the trec_eval tool to run. Please run get_trec_eval.sh inside Castor/utils (as working directory) before continuing.')
             dataset_root = os.path.join(castor_dir, os.pardir, 'Castor-data', 'datasets', 'WikiQA/')
-            train_loader, dev_loader, test_loader = WikiQA.iters(dataset_root, word_vectors_file, word_vectors_dir, batch_size, device=device, unk_init=UnknownWordVecCache.unk)
+            train_loader, dev_loader, test_loader = WikiQA.iters(dataset_root, word_vectors_file, word_vectors_dir,
+                                                                 batch_size, device=device,
+                                                                 unk_init=UnknownWordVecCache.unk)
             embedding = nn.Embedding.from_pretrained(WikiQA.TEXT_FIELD.vocab.vectors)
             return WikiQA, embedding, train_loader, test_loader, dev_loader
         elif dataset_name == 'pit2015':
             if not os.path.exists(os.path.join(castor_dir, utils_trecqa)):
-                raise FileNotFoundError('TrecQA requires the trec_eval tool to run. Please run get_trec_eval.sh inside Castor/utils (as working directory) before continuing.')
+                raise FileNotFoundError(
+                    'TrecQA requires the trec_eval tool to run. Please run get_trec_eval.sh inside Castor/utils (as working directory) before continuing.')
             dataset_root = os.path.join(castor_dir, os.pardir, 'Castor-data', 'datasets', 'SemEval-PIT2015/')
-            train_loader, dev_loader, test_loader = PIT2015.iters(dataset_root, word_vectors_file, word_vectors_dir, batch_size, device=device, unk_init=UnknownWordVecCache.unk)
+            train_loader, dev_loader, test_loader = PIT2015.iters(dataset_root, word_vectors_file, word_vectors_dir,
+                                                                  batch_size, device=device,
+                                                                  unk_init=UnknownWordVecCache.unk,
+                                                                  ngram_char=ngram_char)
             embedding = nn.Embedding.from_pretrained(PIT2015.TEXT_FIELD.vocab.vectors)
             return PIT2015, embedding, train_loader, test_loader, dev_loader
         else:
             raise ValueError('{} is not a valid dataset.'.format(dataset_name))
-

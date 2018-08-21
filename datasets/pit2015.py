@@ -23,11 +23,11 @@ class PIT2015(CastorPairDataset):
     def sort_key(ex):
         return len(ex.sentence_1)
 
-    def __init__(self, path):
+    def __init__(self, path, ngram_char=-1):
         """
         Create a PIT2015 dataset instance
         """
-        super(PIT2015, self).__init__(path)
+        super(PIT2015, self).__init__(path, ngram_char=ngram_char)
 
     @classmethod
     def splits(cls, path, train='train', validation='dev', test='test', **kwargs):
@@ -35,7 +35,7 @@ class PIT2015(CastorPairDataset):
 
     @classmethod
     def iters(cls, path, vectors_name, vectors_dir, batch_size=64, shuffle=True, device=0, pt_file=False, vectors=None,
-              unk_init=torch.Tensor.zero_):
+              unk_init=torch.Tensor.zero_, ngram_char=-1):
         """
         :param path: directory containing train, test, dev files
         :param vectors_name: name of word vectors file
@@ -48,7 +48,7 @@ class PIT2015(CastorPairDataset):
         :return:
         """
 
-        train, validation, test = cls.splits(path)
+        train, validation, test = cls.splits(path, ngram_char=ngram_char)
         if not pt_file:
             if vectors is None:
                 vectors = Vectors(name=vectors_name, cache=vectors_dir, unk_init=unk_init)
