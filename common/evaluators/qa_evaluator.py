@@ -1,3 +1,4 @@
+import torch
 import torch.nn.functional as F
 
 from .evaluator import Evaluator
@@ -13,6 +14,7 @@ class QAEvaluator(Evaluator):
         true_labels = []
         predictions = []
 
+        n_correct = 0
         for batch in self.data_loader:
             qids.extend(batch.id.detach().cpu().numpy())
             # Select embedding
@@ -26,14 +28,20 @@ class QAEvaluator(Evaluator):
 
             del output
 
+            prediction = torch.max(output.detach(), 1)[1].view(batch.label.size()).data
+            gold_label = batch.label.data
+            n_correct += (prediction == gold_label).sum().item()
+
         qids = list(map(lambda n: int(round(n * 10, 0)) / 10, qids))
+
+        acc = n_correct / len(qids)
 
         mean_average_precision, mean_reciprocal_rank = get_map_mrr(qids, predictions, true_labels,
                                                                    self.data_loader.device,
                                                                    keep_results=self.keep_results)
         test_cross_entropy_loss /= len(batch.dataset.examples)
 
-        return [mean_average_precision, mean_reciprocal_rank, test_cross_entropy_loss], ['map', 'mrr', 'cross entropy loss']
+        return [acc, mean_average_precision, mean_reciprocal_rank, test_cross_entropy_loss], ['acc', 'map', 'mrr', 'cross entropy loss']
 
     def get_final_prediction_and_label(self, batch_predictions, batch_labels):
         predictions = batch_predictions.exp()[:, 1]

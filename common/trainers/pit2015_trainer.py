@@ -30,7 +30,7 @@ class PIT2015Trainer(Trainer):
                     100. * batch_idx / (len(self.train_loader)), loss.item() / len(batch))
                 )
 
-            if batch_idx % 80 == 79:
+            if batch_idx % 50 == 49:
                 dev_scores = self.evaluate(self.dev_evaluator, 'dev')
                 accuracy, avg_loss, precision, recall, f1 = dev_scores
                 test_scores = self.evaluate(self.test_evaluator, 'test')

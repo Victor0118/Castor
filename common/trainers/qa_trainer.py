@@ -30,7 +30,7 @@ class QATrainer(Trainer):
                     100. * batch_idx / (len(self.train_loader)), loss.item() / len(batch))
                 )
 
-        mean_average_precision, mean_reciprocal_rank, average_loss = self.evaluate(self.train_evaluator, 'train')
+        acc, mean_average_precision, mean_reciprocal_rank, average_loss = self.evaluate(self.train_evaluator, 'train')
 
         if self.use_tensorboard:
             self.writer.add_scalar('{}/train/cross_entropy_loss'.format(self.train_loader.dataset.NAME), average_loss, epoch)
@@ -52,7 +52,7 @@ class QATrainer(Trainer):
             self.train_epoch(epoch)
 
             dev_scores = self.evaluate(self.dev_evaluator, 'dev')
-            mean_average_precision, mean_reciprocal_rank, new_loss = dev_scores
+            acc, mean_average_precision, mean_reciprocal_rank, new_loss = dev_scores
 
             if self.use_tensorboard:
                 self.writer.add_scalar('{}/lr'.format(self.train_loader.dataset.NAME), self.optimizer.param_groups[0]['lr'], epoch)
