@@ -26,11 +26,10 @@ class QAEvaluator(Evaluator):
             true_labels.extend(batch.label.detach().cpu().numpy())
             predictions.extend(output.detach().exp()[:, 1].cpu().numpy())
 
-            del output
-
             prediction = torch.max(output.detach(), 1)[1].view(batch.label.size()).data
             gold_label = batch.label.data
             n_correct += (prediction == gold_label).sum().item()
+            del output
 
         qids = list(map(lambda n: int(round(n * 10, 0)) / 10, qids))
 

@@ -25,6 +25,8 @@ class PIT2015Evaluator(Evaluator):
             rel_total += gold_label.sum().item()
             pre_total += prediction.sum().item()
 
+            del scores
+
         precision = acc_total / (pre_total + off)
         recall = acc_total / (rel_total + off)
         f1 = 2 * precision * recall / (precision + recall + off)

@@ -51,6 +51,7 @@ class SICKTrainer(Trainer):
             self.train_epoch(epoch)
 
             pearson, spearman, mse, new_loss = self.evaluate(self.dev_evaluator, 'dev')
+            _, _, _, _ = self.evaluate(self.test, 'test')
 
             if self.use_tensorboard:
                 self.writer.add_scalar('sick/lr', self.optimizer.param_groups[0]['lr'], epoch)
