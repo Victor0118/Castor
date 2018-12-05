@@ -9,7 +9,6 @@ from torchtext.data.example import Example
 
 from datasets.idf_utils import get_pairwise_word_to_doc_freq, get_pairwise_overlap_features
 
-
 class CastorPairDataset(Dataset, metaclass=ABCMeta):
 
     # Child classes must define
@@ -49,7 +48,7 @@ class CastorPairDataset(Dataset, metaclass=ABCMeta):
             for i, (pair_id, l1, l2, ext_feats, label) in enumerate(zip(id_file, sent_list_1, sent_list_2, overlap_feats, label_file)):
                 pair_id = pair_id.rstrip('.\n')
                 label = label.rstrip('.\n')
-                example_list = [pair_id, l1, l2, ext_feats, label, i + 1, ' '.join(l1), ' '.join(l2)]
+                example_list = [pair_id, l1, l2, ext_feats, label, i + 1, ' '.join(l1), ' '.join(l2), ]
                 example = Example.fromlist(example_list, fields)
                 examples.append(example)
 

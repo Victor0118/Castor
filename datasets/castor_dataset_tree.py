@@ -67,7 +67,6 @@ class CastorPairTreeDataset(Dataset, metaclass=ABCMeta):
     EXT_FEATS_FIELD = None
     LABEL_FIELD = None
     RAW_TEXT_FIELD = None
-    EXT_FEATS = 4
     AID_FIELD = None
     MASK1_FIELD = None
     MASK2_FIELD = None
@@ -75,6 +74,7 @@ class CastorPairTreeDataset(Dataset, metaclass=ABCMeta):
     LEFT_MASK2_FIELD = None
     RIGHT_MASK1_FIELD = None
     RIGHT_MASK2_FIELD = None
+    EXT_FEATS = 4
     
     @abstractmethod
     def __init__(self, path, load_ext_feats=False):

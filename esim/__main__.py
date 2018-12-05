@@ -13,7 +13,7 @@ from common.evaluation import EvaluatorFactory
 from common.train import TrainerFactory
 from utils.serialization import load_checkpoint
 from .model import ESIM
-
+from .model_tree import TreeESIM
 
 def get_logger():
     logger = logging.getLogger(__name__)
@@ -41,6 +41,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch implementation of Multi-Perspective CNN')
     parser.add_argument('model_outfile', help='file to save final model')
     parser.add_argument('--dataset', help='dataset to use, one of [sick, msrvid, trecqa, wikiqa]', default='sick')
+    parser.add_argument('--arch', help='component to use, one of [norm, tree]', default='tree')
     parser.add_argument('--word-vectors-dir', help='word vectors directory',
                         default=os.path.join(os.pardir, 'Castor-data', 'embeddings', 'GloVe'))
     parser.add_argument('--word-vectors-file', help='word vectors filename', default='glove.840B.300d.txt')
@@ -89,6 +90,11 @@ if __name__ == '__main__':
 
     logger = get_logger()
     logger.info(pprint.pformat(vars(args)))
+    
+    if args.arch == "norm":
+        MODEL = ESIM
+    else:
+        MODEL = TreeESIM
 
     dataset_cls, embedding, train_loader, test_loader, dev_loader \
         = DatasetFactory.get_dataset(args.dataset, args.word_vectors_dir, args.word_vectors_file, args.batch_size, args.device)
@@ -96,9 +102,9 @@ if __name__ == '__main__':
     filter_widths = list(range(1, args.max_window_size + 1)) + [np.inf]
     ext_feats = dataset_cls.EXT_FEATS if args.sparse_features else 0
 
-    model = ESIM(embedding_size=args.word_vectors_dim, device=args.device, num_units=args.word_vectors_dim,
-                  num_classes=dataset_cls.NUM_CLASSES, dropout=args.dropout, max_sentence_length=args.maxlen)
-
+    model = MODEL(embedding_size=args.word_vectors_dim, device=args.device, num_units=args.word_vectors_dim,
+              num_classes=dataset_cls.NUM_CLASSES, dropout=args.dropout, max_sentence_length=args.maxlen)
+        
     model = model.to(device)
     embedding = embedding.to(device)
 

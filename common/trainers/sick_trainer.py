@@ -15,11 +15,10 @@ class SICKTrainer(Trainer):
         total_loss = 0
         for batch_idx, batch in enumerate(self.train_loader):
             self.optimizer.zero_grad()
-
             # Select embedding
             sent1, sent2 = self.get_sentence_embeddings(batch)
 
-            output = self.model(sent1, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw)
+            output = self.model(sent1, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw, batch.mask1, batch.left_mask1, batch.right_mask1, batch.mask2, batch.left_mask2, batch.right_mask2)
             loss = F.kl_div(output, batch.label, size_average=False)
             total_loss += loss.item()
             loss.backward()
@@ -51,6 +50,7 @@ class SICKTrainer(Trainer):
             self.train_epoch(epoch)
 
             pearson, spearman, mse, new_loss = self.evaluate(self.dev_evaluator, 'dev')
+            self.evaluate(self.test_evaluator, 'test')
 
             if self.use_tensorboard:
                 self.writer.add_scalar('sick/lr', self.optimizer.param_groups[0]['lr'], epoch)
@@ -66,7 +66,7 @@ class SICKTrainer(Trainer):
                 best_dev_score = pearson
                 save_checkpoint(epoch, self.model.arch, self.model.state_dict(), self.optimizer.state_dict(), best_dev_score, self.model_outfile)
 
-            if abs(prev_loss - new_loss) <= 0.0002:
+            if abs(prev_loss - new_loss) <= 0.000002:
                 self.logger.info('Early stopping. Loss changed by less than 0.0002.')
                 break
 
