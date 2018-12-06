@@ -18,7 +18,8 @@ class SICKEvaluator(Evaluator):
             # Select embedding
             sent1, sent2 = self.get_sentence_embeddings(batch)
 
-            output = self.model(sent1, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw)
+            # output = self.model(sent1, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw)
+            output = self.model(sent1, sent2, batch.ext_feats, batch.dataset.word_to_doc_cnt, batch.sentence_1_raw, batch.sentence_2_raw, batch.mask1, batch.left_mask1, batch.right_mask1, batch.mask2, batch.left_mask2, batch.right_mask2)
             test_kl_div_loss += F.kl_div(output, batch.label, size_average=False).item()
 
             predict_classes = batch.label.new_tensor(torch.arange(1, num_classes + 1)).expand(self.batch_size, num_classes)

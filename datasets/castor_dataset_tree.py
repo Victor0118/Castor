@@ -115,7 +115,6 @@ class CastorPairTreeDataset(Dataset, metaclass=ABCMeta):
                 l2_new, mask2, left_mask2, right_mask2 = gen_tree(l2_str)
                 # print(" ".join(l1_new), l1_str)
                 # print(len(l1_new), len(l1), len(mask1), len(left_mask1), len(right_mask1))
-                #print(left_mask1)
                 example_list = [pair_id, l1_new, l2_new, ext_feats, label, i + 1, l1, l2, mask1, left_mask1, right_mask1, mask2, left_mask2, right_mask2]
                 example = Example.fromlist(example_list, fields)
                 examples.append(example)

@@ -195,6 +195,7 @@ class TreeESIM(nn.Module):
                                                     nn.Dropout(p=dropout), nn.Linear(num_units, num_classes))
 
         self.init_weight()
+        
 
     def ortho_weight(self):
         """
@@ -279,6 +280,18 @@ class TreeESIM(nn.Module):
         return torch.from_numpy(masks).float().to(self.device)
 
     def forward(self, x1, x2, ext_feats=None, word_to_doc_count=None, raw_sent1=None, raw_sent2=None, x1_mask=None, x1_left_mask=None, x1_right_mask=None, x2_mask=None, x2_left_mask=None, x2_right_mask=None):
+        
+        #pad_num1 = x1.shape[2] - x1_left_mask.shape[1]
+        #pad1 = nn.ConstantPad2d((pad_num1, 0, pad_num1, 0), 0)
+        #pad_num2 = x2.shape[2] - x2_left_mask.shape[1]
+        #pad2 = nn.ConstantPad2d((pad_num2, 0, pad_num2, 0), 0)
+        #print(pad_num1, pad_num2)
+
+        #x1_left_mask = pad1(x1_left_mask)
+        #x1_right_mask = pad1(x1_right_mask)
+        #x2_left_mask = pad1(x2_left_mask)
+        #x2_right_mask = pad1(x2_right_mask)
+        
         x1 = x1.permute(2, 0, 1) # from [B * D * T] to [T * B * D]
         x2 = x2.permute(2, 0, 1)
         x1_mask = x1_mask.permute(1, 0)
