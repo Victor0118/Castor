@@ -3,7 +3,7 @@ import os
 import torch
 import torch.nn as nn
 
-#from datasets.sick import SICK
+from datasets.sick import SICK
 from datasets.sick_tree import SICKTree
 from datasets.msrvid import MSRVID
 from datasets.trecqa import TRECQA
@@ -41,9 +41,6 @@ class DatasetFactory(object):
         if dataset_name == 'sick':
             dataset_root = os.path.join(castor_dir, os.pardir, 'Castor-data', 'datasets', 'sick/')
             train_loader, dev_loader, test_loader = SICKTree.iters(dataset_root, word_vectors_file, word_vectors_dir, batch_size, device=device, unk_init=UnknownWordVecCache.unk)
-            for batch in train_loader:
-                print(batch)
-                return 
             embedding = nn.Embedding.from_pretrained(SICKTree.TEXT_FIELD.vocab.vectors)
             return SICKTree, embedding, train_loader, test_loader, dev_loader
         elif dataset_name == 'msrvid':

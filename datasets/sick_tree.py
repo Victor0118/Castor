@@ -30,14 +30,14 @@ class SICKTree(CastorPairTreeDataset):
     NUM_CLASSES = 5
     ID_FIELD = Field(sequential=False, use_vocab=False, batch_first=True)
     TEXT_FIELD = Field(batch_first=True, tokenize=lambda x: x, pad_first=True)  # tokenizer is identity since we already tokenized it to compute external features
-    EXT_FEATS_FIELD = Field(tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, tokenize=lambda x: x)
+    EXT_FEATS_FIELD = Field(tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, sequential=False)
     LABEL_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, postprocessing=Pipeline(get_class_probs))
-    MARK1_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
-    MARK2_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
-    LEFT_MARK1_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
-    LEFT_MARK2_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
-    RIGHT_MARK1_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
-    RIGHT_MARK2_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
+    MASK1_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
+    MASK2_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
+    LEFT_MASK1_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
+    LEFT_MASK2_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
+    RIGHT_MASK1_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
+    RIGHT_MASK2_FIELD = Field(sequential=False, tensor_type=torch.FloatTensor, use_vocab=False, batch_first=True, pad_token=0.0, pad_first=True)
     RAW_TEXT_FIELD = RawField()
 
     @staticmethod

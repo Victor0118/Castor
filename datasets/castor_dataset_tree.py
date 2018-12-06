@@ -52,9 +52,14 @@ def convert_ptb_to_tree(line):
 
 def gen_tree(sent):
     tree = convert_ptb_to_tree(sent)
+    # print(sent)
     sent, lm, rm = tree.convert_to_sequence_and_masks(tree.root)
-    m = [1] * len(sent)
-    return sent, m, list(lm[0]), list(rm[0])
+    m = [1.0] * len(sent)
+    # assert len(lm) == 1
+    #if len(lm) != 1:
+    #    print(sent)
+    #    print(lm)
+    return sent, m, lm, rm
 
 
 class CastorPairTreeDataset(Dataset, metaclass=ABCMeta):
@@ -104,10 +109,13 @@ class CastorPairTreeDataset(Dataset, metaclass=ABCMeta):
             for i, (pair_id, l1, l2, ext_feats, label) in enumerate(zip(id_file, sent_list_1, sent_list_2, overlap_feats, label_file)):
                 pair_id = pair_id.rstrip('.\n')
                 label = label.rstrip('.\n')
-                l1 = " ".join(l1)
-                l2 = " ".join(l2)
-                l1_new, mask1, left_mask1, right_mask1 = gen_tree(l1)
-                l2_new, mask2, left_mask2, right_mask2 = gen_tree(l2)
+                l1_str = " ".join(l1)
+                l2_str = " ".join(l2)
+                l1_new, mask1, left_mask1, right_mask1 = gen_tree(l1_str)
+                l2_new, mask2, left_mask2, right_mask2 = gen_tree(l2_str)
+                # print(" ".join(l1_new), l1_str)
+                # print(len(l1_new), len(l1), len(mask1), len(left_mask1), len(right_mask1))
+                #print(left_mask1)
                 example_list = [pair_id, l1_new, l2_new, ext_feats, label, i + 1, l1, l2, mask1, left_mask1, right_mask1, mask2, left_mask2, right_mask2]
                 example = Example.fromlist(example_list, fields)
                 examples.append(example)

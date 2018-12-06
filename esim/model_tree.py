@@ -239,7 +239,6 @@ class TreeESIM(nn.Module):
         return out.view(raw_attentions.size(0),raw_attentions.size(1),raw_attentions.size(2))
 
     def _transformation_input(self,embed_sent, x1_mask, x1_left_mask, x1_right_mask):
-        embed_sent = self.word_embedding(embed_sent)
         embed_sent = self.dropout(embed_sent)
         hidden=self.tree_lstm_intra(embed_sent, x1_mask, x1_left_mask, x1_right_mask)
         return hidden
@@ -280,6 +279,15 @@ class TreeESIM(nn.Module):
         return torch.from_numpy(masks).float().to(self.device)
 
     def forward(self, x1, x2, ext_feats=None, word_to_doc_count=None, raw_sent1=None, raw_sent2=None, x1_mask=None, x1_left_mask=None, x1_right_mask=None, x2_mask=None, x2_left_mask=None, x2_right_mask=None):
+        x1 = x1.permute(2, 0, 1) # from [B * D * T] to [T * B * D]
+        x2 = x2.permute(2, 0, 1)
+        x1_mask = x1_mask.permute(1, 0)
+        x2_mask = x2_mask.permute(1, 0)
+        x1_left_mask = x1_left_mask.permute(1, 0, 2)
+        x2_left_mask = x2_left_mask.permute(1, 0, 2)
+        x1_right_mask = x1_right_mask.permute(1, 0, 2)
+        x2_right_mask = x2_right_mask.permute(1, 0, 2)
+
         sent1=self._transformation_input(x1,x1_mask, x1_left_mask, x1_right_mask)
         sent2=self._transformation_input(x2,x2_mask, x2_left_mask, x2_right_mask)
 
@@ -311,5 +319,6 @@ class TreeESIM(nn.Module):
         inp2=self.dropout(self.linear_layer_compare(inp2))
         v1=self.tree_lstm_compare(inp1, x1_mask, x1_left_mask, x1_right_mask)
         v2=self.tree_lstm_compare(inp2, x2_mask, x2_left_mask, x2_right_mask)
-        logits = self.aggregate(v1, v2)
-        return logits
+        out = self.aggregate(v1, v2)
+        out = F.log_softmax(out, dim=1)
+        return out
