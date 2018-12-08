@@ -254,21 +254,7 @@ class ESIM(nn.Module):
         simCube=F.cosine_similarity(simCube_0, simCube_1)
         return simCube.view(tensor1.size(0),tensor2.size(0))
     
-    def create_mask(self, sent):
-        masks = []
-        sent_lengths = [len(s.split(" ")) for s in sent]
-        max_len = max(sent_lengths)
-
-        for s_length in sent_lengths:
-            pad_mask = np.zeros(max_len)
-            pad_mask[:s_length] = 1
-            masks.append(pad_mask)
-
-        masks = np.array(masks)
-        return torch.from_numpy(masks).float().to(self.device)
-
-    #def forward(self, x1, x1_mask, x2, x2_mask):
-    def forward(self, sent1, sent2, ext_feats=None, word_to_doc_count=None, raw_sent1=None, raw_sent2=None):
+    def forward(self, sent1, sent2, ext_feats=None, word_to_doc_count=None, raw_sent1=None, raw_sent2=None, x1_mask=None, x2_mask=None, visualize=False):
         # idx = [i for i in range(embed_sent.size(1) - 1, -1, -1)]
         # if torch.cuda.is_available():
         #   idx = torch.cuda.LongTensor(idx)
@@ -276,8 +262,6 @@ class ESIM(nn.Module):
         #   idx = torch.LongTensor(idx)
         sent1 = sent1.permute(2, 0, 1) # from [B * D * T] to [T * B * D]
         sent2 = sent2.permute(2, 0, 1)
-        x1_mask = self.create_mask(raw_sent1)
-        x2_mask = self.create_mask(raw_sent2)
         x1_mask = x1_mask.permute(1, 0)
         x2_mask = x2_mask.permute(1, 0)
         #x1 = self.word_embedding(x1)
@@ -313,6 +297,9 @@ class ESIM(nn.Module):
 
         # weight_matrix: #sample x #step1 x #step2
         weight_matrix = torch.matmul(ctx1.permute(1, 0, 2), ctx2.permute(1, 2, 0))
+        if visualize:
+            return weight_matrix
+
         weight_matrix_1 = torch.exp(weight_matrix - weight_matrix.max(1, keepdim=True)[0]).permute(1, 2, 0)
         weight_matrix_2 = torch.exp(weight_matrix - weight_matrix.max(2, keepdim=True)[0]).permute(1, 2, 0)
 

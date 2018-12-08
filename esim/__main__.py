@@ -14,6 +14,7 @@ from common.train import TrainerFactory
 from utils.serialization import load_checkpoint
 from .model import ESIM
 from .model_tree import TreeESIM
+from .model_tree_seq import TreeSeqESIM
 
 def get_logger():
     logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch implementation of Multi-Perspective CNN')
     parser.add_argument('model_outfile', help='file to save final model')
     parser.add_argument('--dataset', help='dataset to use, one of [sick, msrvid, trecqa, wikiqa]', default='sick')
-    parser.add_argument('--arch', help='component to use, one of [norm, tree]', default='tree')
+    parser.add_argument('--arch', help='component to use, one of [seq, tree, seq-tree]', default='tree')
     parser.add_argument('--word-vectors-dir', help='word vectors directory',
                         default=os.path.join(os.pardir, 'Castor-data', 'embeddings', 'GloVe'))
     parser.add_argument('--word-vectors-file', help='word vectors filename', default='glove.840B.300d.txt')
@@ -91,10 +92,14 @@ if __name__ == '__main__':
     logger = get_logger()
     logger.info(pprint.pformat(vars(args)))
     
-    if args.arch == "norm":
+    if args.arch == "seq":
         MODEL = ESIM
-    else:
+    elif args.arch == "tree":
         MODEL = TreeESIM
+    elif args.arch == "seq-tree":
+        MODEL = TreeSeqESIM
+    else:
+        logger.warn("unsupported arch: {}".format(args.arch))
 
     dataset_cls, embedding, train_loader, test_loader, dev_loader \
         = DatasetFactory.get_dataset(args.dataset, args.word_vectors_dir, args.word_vectors_file, args.batch_size, args.device)
