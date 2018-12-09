@@ -37,5 +37,8 @@ class TreeSeqESIM(nn.Module):
     def forward(self, x1, x2, ext_feats=None, word_to_doc_count=None, raw_sent1=None, raw_sent2=None, x1_mask=None, x1_left_mask=None, x1_right_mask=None, x2_mask=None, x2_left_mask=None, x2_right_mask=None, visualize=False):
         
         out_tree = self.tree_esim(x1, x2, x1_mask=x1_mask, x1_left_mask=x1_left_mask, x1_right_mask=x1_right_mask, x2_mask=x2_mask, x2_left_mask=x2_left_mask, x2_right_mask=x2_left_mask, visualize=visualize)
-        out_seq = self.seq_esim(x1, x2, x1_mask=x1_mask, x2_mask=x2_mask, visualize=visualize)
+        if visualize:
+            return out_tree
+
+        out_seq = self.seq_esim(x1, x2, x1_mask=x1_mask, x2_mask=x2_mask)
         return (out_tree + out_seq) / 2
